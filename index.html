@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>지역봉사지도원 활동일지</title>
+
+  <meta property="og:title" content="지역봉사지도원 활동일지 작성하기" />
+  <meta property="og:description" content="오늘 활동일지를 간편하게 작성해 주세요." />
+  <meta property="og:image" content="https://dagajala-star.github.io/activity-landing/info.png" />
+  <meta property="og:url" content="https://dagajala-star.github.io/activity-landing/" />
+  <meta property="og:type" content="website" />
+
+  <script>
+    (function () {
+      // ✅ 너의 Apps Script 웹앱 주소 (그대로)
+      const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwRFx-3vd65PAxY2AtJJ6Tb35jI239DZyQj8YD2xIMxQwMZJOc2lJKaHZ9PKYSGSu9U/exec";
+
+      // 1) GitHub Pages로 들어온 쿼리스트링 (?name=홍길동&month=12 등)
+      const qs = new URLSearchParams(window.location.search);
+
+      // 2) 플랫폼이 쿼리를 깨는 경우 대비: 해시(#name=홍길동)도 지원
+      if (!qs.has("name") && window.location.hash) {
+        const hs = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        if (hs.has("name")) qs.set("name", hs.get("name"));
+      }
+
+      const paramStr = qs.toString();
+
+      // WEBAPP_URL에 ?가 이미 있을 수도 있으니 안전하게 연결
+      const joiner = WEBAPP_URL.includes("?") ? "&" : "?";
+      const target = paramStr ? (WEBAPP_URL + joiner + paramStr) : WEBAPP_URL;
+
+      // ✅ 히스토리 깔끔하게 이동
+      window.location.replace(target);
+    })();
+  </script>
+</head>
+<body></body>
+</html>
