@@ -1,7 +1,8 @@
 <!doctype html>
-<html>
+<html lang="ko">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>지역봉사지도원 활동일지</title>
 
   <meta property="og:title" content="지역봉사지도원 활동일지 작성하기" />
@@ -9,6 +10,66 @@
   <meta property="og:image" content="https://dagajala-star.github.io/activity-landing/info.png" />
   <meta property="og:url" content="https://dagajala-star.github.io/activity-landing/" />
   <meta property="og:type" content="website" />
+
+  <!-- 리다이렉트 대상 도메인 미리 연결(체감 속도 약간 개선) -->
+  <link rel="preconnect" href="https://script.google.com" crossorigin>
+  <link rel="dns-prefetch" href="//script.google.com">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans KR", Arial, sans-serif;
+      background: #fff;
+      color: #111;
+    }
+    .wrap {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px;
+      text-align: center;
+    }
+    .title {
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1.3;
+      letter-spacing: -0.2px;
+    }
+    .sub {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      opacity: 0.78;
+      line-height: 1.45;
+    }
+    .dots {
+      display: inline-block;
+      width: 1.6em;
+      text-align: left;
+    }
+    .dots::after {
+      content: "";
+      display: inline-block;
+      width: 1.6em;
+      animation: dots 1.1s infinite steps(4, end);
+    }
+    @keyframes dots {
+      0%   { content: ""; }
+      25%  { content: "."; }
+      50%  { content: ".."; }
+      75%  { content: "..."; }
+      100% { content: ""; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div>
+      <div class="title">활동일지로 이동 중입니다<span class="dots"></span></div>
+      <div class="sub">잠시만 기다려 주세요. 곧 자동으로 연결됩니다.</div>
+    </div>
+  </div>
 
   <script>
     (function () {
@@ -30,10 +91,22 @@
       const joiner = WEBAPP_URL.includes("?") ? "&" : "?";
       const target = paramStr ? (WEBAPP_URL + joiner + paramStr) : WEBAPP_URL;
 
-      // ✅ 히스토리 깔끔하게 이동
-      window.location.replace(target);
+      // ✅ 화면이 먼저 그려진 뒤 이동 (두 번 rAF로 페인트 보장)
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          window.location.replace(target);
+        });
+      });
     })();
   </script>
-</head>
-<body></body>
+
+  <noscript>
+    <div class="wrap">
+      <div>
+        <div class="title">자바스크립트가 꺼져 있어요.</div>
+        <div class="sub">브라우저 설정에서 자바스크립트를 켜주세요.</div>
+      </div>
+    </div>
+  </noscript>
+</body>
 </html>
