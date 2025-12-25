@@ -1,31 +1,126 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>알림 켜기</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>매달 20일 오전 10시 알림 켜기</title>
 
+  <!-- OneSignal Web SDK v16 -->
   <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+
   <script>
+    // ✅ 네 OneSignal App ID
+    const ONESIGNAL_APP_ID = "35e89974-124f-4553-aa37-84f3bc6085de";
+
+    // URL에서 k/name을 받아 저장(kr74.github.io 기준으로만 저장됨)
+    const qs = new URLSearchParams(location.search);
+    const k = (qs.get('k') || '').trim();
+    const name = (qs.get('name') || '').trim();
+
+    if (k) localStorage.setItem('saved_k', k);
+    if (name) localStorage.setItem('saved_name', name);
+
+    // 화면에 표시용
+    function showInfo() {
+      const info = document.getElementById('info');
+      if (!info) return;
+      const kk = k || localStorage.getItem('saved_k') || '';
+      const nn = name || localStorage.getItem('saved_name') || '';
+      const parts = [];
+      if (kk) parts.push('코드: ' + kk);
+      if (nn) parts.push('이름: ' + nn);
+      info.textContent = parts.length ? parts.join(' / ') : '';
+    }
+
     window.OneSignalDeferred = window.OneSignalDeferred || [];
-    OneSignalDeferred.push(async function(OneSignal) {
+    window.OneSignalDeferred.push(async function(OneSignal) {
       await OneSignal.init({
-        appId: "35e89974-124f-4553-aa37-84f3bc6085de",
+        appId: ONESIGNAL_APP_ID
       });
+
+      // 로컬 저장값을 우선으로 태그 준비
+      const kk = k || localStorage.getItem('saved_k') || '';
+      const nn = name || localStorage.getItem('saved_name') || '';
+
+      try {
+        const tags = {
+          reminder_enabled: '1',
+          reminder_day: '20',
+          reminder: 'day20_1000'
+        };
+        if (kk) tags.center_code = kk;
+        if (nn) tags.leader_name = nn;
+
+        if (OneSignal.User && OneSignal.User.addTags) {
+          OneSignal.User.addTags(tags);
+        }
+      } catch (e) {}
+
+      showInfo();
     });
 
-    function enablePush(){
-      OneSignalDeferred.push(async function(OneSignal) {
-        // 버튼 누르면 폰 기본 “허용/차단” 팝업 뜸
-        OneSignal.Notifications.requestPermission();
-      });
+    async function enablePush() {
+      const msg = document.getElementById('msg');
+      if (msg) msg.textContent = '처리 중...';
+
+      try {
+        // 브라우저 기본 허용/차단 팝업 (이미 차단한 경우, 다시 안 뜰 수 있음)
+        window.OneSignalDeferred.push(async function(OneSignal) {
+          const supported = OneSignal.Notifications.isPushSupported
+            ? OneSignal.Notifications.isPushSupported()
+            : true;
+
+          if (supported === false) {
+            if (msg) msg.textContent = '⚠️ 이 기기/브라우저는 알림을 지원하지 않아요.';
+            return;
+          }
+
+          await OneSignal.Notifications.requestPermission();
+
+          const allowed = OneSignal.Notifications.hasPermission
+            ? await OneSignal.Notifications.hasPermission()
+            : (OneSignal.Notifications.permission === 'granted');
+
+          if (msg) {
+            msg.textContent = allowed
+              ? '✅ 알림이 켜졌습니다. (이 창을 닫아도 됩니다)'
+              : '⚠️ 알림이 꺼져있어요. “허용”을 눌러야 합니다.';
+          }
+        });
+      } catch (e) {
+        if (msg) msg.textContent = '⚠️ 알림 설정을 진행하지 못했어요. (이미 차단했거나, 브라우저 정책으로 팝업이 안 뜰 수 있어요)';
+      }
     }
+    window.enablePush = enablePush;
   </script>
+
+  <style>
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans KR",Arial,sans-serif;background:#fff;color:#111}
+    .wrap{min-height:100vh;display:grid;place-items:center;padding:22px;text-align:center}
+    .card{max-width:560px;width:100%;border:1px solid #e7e7e7;border-radius:18px;padding:22px;box-shadow:0 6px 22px rgba(0,0,0,.06)}
+    h1{font-size:24px;margin:0 0 10px;font-weight:900}
+    p{margin:8px 0;font-size:16px;line-height:1.55}
+    #info{margin:10px 0 2px;font-weight:900;opacity:.75}
+    .btn{width:100%;font-size:22px;font-weight:900;padding:14px 18px;border:none;border-radius:14px;cursor:pointer}
+    .btn.primary{background:#111;color:#fff}
+    .small{opacity:.75;font-size:14px;margin-top:12px;line-height:1.5}
+    #msg{margin-top:14px;font-weight:900}
+  </style>
 </head>
-<body>
-  <h2>매달 20일 오전 10시 알림 켜기</h2>
-  <button onclick="enablePush()" style="font-size:22px;padding:14px 18px;">
-    알림 켜기
-  </button>
+<body onload="showInfo()">
+  <div class="wrap">
+    <div class="card">
+      <h1>매달 20일 오전 10시 알림 켜기</h1>
+      <div id="info"></div>
+      <p>아래 버튼을 누르면 휴대폰에서 <b>알림 허용/차단</b> 창이 뜹니다.</p>
+      <p><b>허용</b>을 누르면 매달 20일 오전 10시에 “활동일지 작성” 알림이 옵니다.</p>
+      <button class="btn primary" onclick="enablePush()">알림 켜기</button>
+      <div id="msg"></div>
+      <div class="small">
+        ※ 버튼을 눌러도 아무 창이 안 뜨면, 이미 “차단”을 눌렀을 수 있어요.<br/>
+        크롬 설정에서 이 사이트 알림을 “허용”으로 바꿔야 다시 뜹니다.
+      </div>
+    </div>
+  </div>
 </body>
 </html>
