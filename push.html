@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>알림 켜기</title>
+
+  <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+  <script>
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    OneSignalDeferred.push(async function(OneSignal) {
+      await OneSignal.init({
+        appId: "35e89974-124f-4553-aa37-84f3bc6085de",
+      });
+    });
+
+    function enablePush(){
+      OneSignalDeferred.push(async function(OneSignal) {
+        // 버튼 누르면 폰 기본 “허용/차단” 팝업 뜸
+        OneSignal.Notifications.requestPermission();
+      });
+    }
+  </script>
+</head>
+<body>
+  <h2>매달 20일 오전 10시 알림 켜기</h2>
+  <button onclick="enablePush()" style="font-size:22px;padding:14px 18px;">
+    알림 켜기
+  </button>
+</body>
+</html>
