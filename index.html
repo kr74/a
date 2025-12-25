@@ -7,7 +7,7 @@
 
   <meta property="og:title" content="지역봉사지도원 활동일지 작성하기" />
   <meta property="og:description" content="오늘 활동일지를 간편하게 작성해 주세요." />
-  <meta property="og:image" content="https://dagajala-star.github.io/activity-landing/info.png" />
+  <meta property="og:image" content="https://kr74.github.io/a/info.png" />
   <meta property="og:url" content="https://kr74.github.io/a/" />
   <meta property="og:type" content="website" />
 
@@ -35,53 +35,33 @@
     </div>
   </div>
 
-  <script>
-    (function () {
-      const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwRFx-3vd65PAxY2AtJJ6Tb35jI239DZyQj8YD2xIMxQwMZJOc2lJKaHZ9PKYSGSu9U/exec";
+<script>
+(function () {
+  const WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwRFx-3vd65PAxY2AtJJ6Tb35jI239DZyQj8YD2xIMxQwMZJOc2lJKaHZ9PKYSGSu9U/exec";
 
-      // ✅ kr74(푸시 클릭 URL)에서 저장/복구할 키
-      const K_STORE_KEY = "CENTER_CODE";
-      const NAME_STORE_KEY = "USER_NAME";
+  // 1) 쿼리 파라미터 (?k=..., ?name=... 등)
+  const qs = new URLSearchParams(window.location.search);
 
-      // 1) 쿼리 + 해시 파라미터 합치기
-      const qs = new URLSearchParams(window.location.search);
-      if (window.location.hash) {
-        const hs = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-        for (const [k, v] of hs.entries()) {
-          if (!qs.has(k)) qs.set(k, v);
-        }
-      }
+  // 2) 해시 파라미터(#k=...)도 합칠지 여부: 필요 없으면 이 블록 통째로 삭제 가능
+  if (window.location.hash) {
+    const hs = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    for (const [k, v] of hs.entries()) {
+      if (!qs.has(k)) qs.set(k, v);
+    }
+  }
 
-      // 2) k 저장/복구
-      const incomingK = (qs.get("k") || "").trim();
-      if (incomingK) {
-        localStorage.setItem(K_STORE_KEY, incomingK);
-      } else {
-        const savedK = (localStorage.getItem(K_STORE_KEY) || "").trim();
-        if (savedK) qs.set("k", savedK);
-      }
+  // 3) 구글 웹앱으로 그대로 전달 (저장/복구 없음)
+  const paramStr = qs.toString();
+  const joiner = WEBAPP_URL.includes("?") ? "&" : "?";
+  const target = paramStr ? (WEBAPP_URL + joiner + paramStr) : WEBAPP_URL;
 
-      // 3) name 저장/복구
-      const incomingName = (qs.get("name") || "").trim();
-      if (incomingName) {
-        localStorage.setItem(NAME_STORE_KEY, incomingName);
-      } else {
-        const savedName = (localStorage.getItem(NAME_STORE_KEY) || "").trim();
-        if (savedName) qs.set("name", savedName);
-      }
-
-      // 4) 구글 웹앱으로 전달
-      const paramStr = qs.toString();
-      const joiner = WEBAPP_URL.includes("?") ? "&" : "?";
-      const target = paramStr ? (WEBAPP_URL + joiner + paramStr) : WEBAPP_URL;
-
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          window.location.replace(target);
-        });
-      });
-    })();
-  </script>
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      window.location.replace(target);
+    });
+  });
+})();
+</script>
 
   <noscript>
     <div class="wrap">
